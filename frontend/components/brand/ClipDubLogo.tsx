@@ -48,24 +48,13 @@ export function ClipDubLogo({
           </linearGradient>
 
           {/* Subtle inner glow */}
-          <radialGradient
-            id="sm-grad-glow"
-            cx="0.35"
-            cy="0.35"
-            r="0.65"
-          >
+          <radialGradient id="sm-grad-glow" cx="0.35" cy="0.35" r="0.65">
             <stop offset="0%" stopColor="#FF5E3A" stopOpacity="0.25" />
             <stop offset="100%" stopColor="#FF5E3A" stopOpacity="0" />
           </radialGradient>
 
           {/* Spark gradient */}
-          <linearGradient
-            id="sm-grad-spark"
-            x1="0"
-            y1="0"
-            x2="1"
-            y2="1"
-          >
+          <linearGradient id="sm-grad-spark" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#F5C542" />
             <stop offset="100%" stopColor="#FFFBE6" />
           </linearGradient>
@@ -114,14 +103,15 @@ export function ClipDubLogo({
         />
 
         {/* Play triangle — slightly off-center left for visual balance */}
-        <path
-          d="M26 20 L46 32 L26 44Z"
-          fill="white"
-          opacity="0.95"
-        />
+        <path d="M26 20 L46 32 L26 44Z" fill="white" opacity="0.95" />
 
         {/* AI spark: 3 small radiating lines at the play button tip */}
-        <g stroke="#FFFBE6" strokeWidth="1.8" strokeLinecap="round" opacity="0.9">
+        <g
+          stroke="#FFFBE6"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          opacity="0.9"
+        >
           {/* Main spark ray — horizontal */}
           <line x1="47" y1="32" x2="53" y2="32" />
           {/* Upper ray */}

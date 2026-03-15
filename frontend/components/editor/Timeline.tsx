@@ -254,17 +254,17 @@ export function Timeline({ trimRegions, onUpdateTrim, onRemoveTrim, selection, o
   }
 
   const formatTime = (frame: number) => {
-    const s = frame / fps;
-    const m = Math.floor(s / 60);
-    const sec = (s % 60).toFixed(1);
-    return `${m}:${sec.padStart(4, "0")}`;
+    const totalSeconds = frame / fps;
+    const m = Math.floor(totalSeconds / 60);
+    const s = Math.floor(totalSeconds % 60);
+    return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
   return (
     <div className="flex h-full flex-col border-t border-border/40 bg-surface">
       <div
         ref={timelineRef}
-        className="relative cursor-crosshair overflow-x-auto overflow-y-hidden"
+        className="relative cursor-crosshair overflow-x-auto overflow-y-auto"
         style={{ minHeight: thumbnails.length > 0 ? 190 : 140 }}
         onMouseDown={handleTimelineMouseDown}
       >
@@ -318,60 +318,92 @@ export function Timeline({ trimRegions, onUpdateTrim, onRemoveTrim, selection, o
           )}
 
           {/* Subtitle tracks */}
-          <div className="relative mt-2" style={{ height: 100 }}>
-            {project.subtitles.map((sub, i) => {
-              const left = frameToX(sub.startFrame);
-              const width = frameToX(sub.endFrame - sub.startFrame);
-              const isSelected = sub.id === selectedSubtitleId;
+          {(() => {
+            // Assign lanes: subtitles that overlap in time go to different lanes
+            const ROW_HEIGHT = 32;
+            const SUB_HEIGHT = 28;
+            const lanes: { endFrame: number }[] = [];
+            const laneMap = new Map<string, number>();
 
-              return (
-                <div
-                  key={sub.id}
-                  className={cn(
-                    "absolute flex items-center rounded-md text-xs transition-all cursor-grab active:cursor-grabbing border",
-                    isSelected
-                      ? "bg-primary/35 text-foreground ring-1 ring-primary/50 border-primary/50"
-                      : "bg-primary/20 text-foreground/80 border-primary/30 hover:bg-primary/30"
-                  )}
-                  style={{
-                    left,
-                    width: Math.max(width, 20),
-                    top: (i % 3) * 32 + 2,
-                    height: 28,
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedSubtitle(sub.id);
-                  }}
-                  onMouseDown={(e) => handleMouseDown(e, "subtitle-move", sub.id)}
-                >
-                  {/* Resize handle left */}
-                  <div
-                    className="absolute left-0 top-0 h-full w-2 cursor-col-resize rounded-l-md bg-primary/30 transition-colors hover:bg-primary/60 flex items-center justify-center"
-                    onMouseDown={(e) => handleMouseDown(e, "subtitle-start", sub.id)}
-                  >
-                    <div className="flex flex-col gap-[2px]">
-                      <div className="h-px w-1 bg-primary/50" />
-                      <div className="h-px w-1 bg-primary/50" />
-                      <div className="h-px w-1 bg-primary/50" />
+            // Sort by startFrame for lane assignment
+            const sorted = [...project.subtitles].sort((a, b) => a.startFrame - b.startFrame);
+            for (const sub of sorted) {
+              let assigned = false;
+              for (let l = 0; l < lanes.length; l++) {
+                if (sub.startFrame >= lanes[l].endFrame) {
+                  lanes[l].endFrame = sub.endFrame;
+                  laneMap.set(sub.id, l);
+                  assigned = true;
+                  break;
+                }
+              }
+              if (!assigned) {
+                laneMap.set(sub.id, lanes.length);
+                lanes.push({ endFrame: sub.endFrame });
+              }
+            }
+
+            const laneCount = Math.max(lanes.length, 1);
+            const trackHeight = laneCount * ROW_HEIGHT + 4;
+
+            return (
+              <div className="relative mt-2" style={{ height: trackHeight }}>
+                {project.subtitles.map((sub) => {
+                  const left = frameToX(sub.startFrame);
+                  const width = frameToX(sub.endFrame - sub.startFrame);
+                  const isSelected = sub.id === selectedSubtitleId;
+                  const lane = laneMap.get(sub.id) ?? 0;
+
+                  return (
+                    <div
+                      key={sub.id}
+                      className={cn(
+                        "absolute flex items-center rounded-md text-xs transition-all cursor-grab active:cursor-grabbing border",
+                        isSelected
+                          ? "bg-primary/35 text-foreground ring-1 ring-primary/50 border-primary/50"
+                          : "bg-primary/20 text-foreground/80 border-primary/30 hover:bg-primary/30"
+                      )}
+                      style={{
+                        left,
+                        width: Math.max(width, 20),
+                        top: lane * ROW_HEIGHT + 2,
+                        height: SUB_HEIGHT,
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedSubtitle(sub.id);
+                      }}
+                      onMouseDown={(e) => handleMouseDown(e, "subtitle-move", sub.id)}
+                    >
+                      {/* Resize handle left */}
+                      <div
+                        className="absolute left-0 top-0 h-full w-2 cursor-col-resize rounded-l-md bg-primary/30 transition-colors hover:bg-primary/60 flex items-center justify-center"
+                        onMouseDown={(e) => handleMouseDown(e, "subtitle-start", sub.id)}
+                      >
+                        <div className="flex flex-col gap-[2px]">
+                          <div className="h-px w-1 bg-primary/50" />
+                          <div className="h-px w-1 bg-primary/50" />
+                          <div className="h-px w-1 bg-primary/50" />
+                        </div>
+                      </div>
+                      <span className="truncate px-3 font-medium">{sub.text}</span>
+                      {/* Resize handle right */}
+                      <div
+                        className="absolute right-0 top-0 h-full w-2 cursor-col-resize rounded-r-md bg-primary/30 transition-colors hover:bg-primary/60 flex items-center justify-center"
+                        onMouseDown={(e) => handleMouseDown(e, "subtitle-end", sub.id)}
+                      >
+                        <div className="flex flex-col gap-[2px]">
+                          <div className="h-px w-1 bg-primary/50" />
+                          <div className="h-px w-1 bg-primary/50" />
+                          <div className="h-px w-1 bg-primary/50" />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <span className="truncate px-3 font-medium">{sub.text}</span>
-                  {/* Resize handle right */}
-                  <div
-                    className="absolute right-0 top-0 h-full w-2 cursor-col-resize rounded-r-md bg-primary/30 transition-colors hover:bg-primary/60 flex items-center justify-center"
-                    onMouseDown={(e) => handleMouseDown(e, "subtitle-end", sub.id)}
-                  >
-                    <div className="flex flex-col gap-[2px]">
-                      <div className="h-px w-1 bg-primary/50" />
-                      <div className="h-px w-1 bg-primary/50" />
-                      <div className="h-px w-1 bg-primary/50" />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
 
           {/* Trim regions */}
           {trimRegions && trimRegions.length > 0 && (

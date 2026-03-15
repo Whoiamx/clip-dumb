@@ -312,7 +312,7 @@ export function StepPreview() {
       </div>
 
       {/* Timeline */}
-      <div className="overflow-hidden rounded-xl border border-border/40" style={{ height: 180 }}>
+      <div className="overflow-hidden rounded-xl border border-border/40" style={{ minHeight: 180, maxHeight: 400 }}>
         <Timeline
           trimRegions={project.trimRegions}
           selection={timelineSelection}
