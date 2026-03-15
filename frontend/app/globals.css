@@ -2,22 +2,22 @@
 
 /* ── Dark theme (default) ── */
 @theme {
-  --color-background: #0B0F19;
+  --color-background: #111520;
   --color-foreground: #F0EDE8;
-  --color-card: #111827;
+  --color-card: #181D2E;
   --color-card-foreground: #F0EDE8;
   --color-primary: #FF5E3A;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #1E293B;
-  --color-secondary-foreground: #94A3B8;
-  --color-muted: #151C2C;
-  --color-muted-foreground: #64748B;
+  --color-secondary: #232A3C;
+  --color-secondary-foreground: #A8B2C1;
+  --color-muted: #1C2234;
+  --color-muted-foreground: #8B95A9;
   --color-accent: #F5C542;
-  --color-accent-foreground: #0B0F19;
+  --color-accent-foreground: #111520;
   --color-destructive: #EF4444;
-  --color-border: #1E293B;
+  --color-border: #2A3245;
   --color-ring: #FF5E3A;
-  --color-surface: #0F1525;
+  --color-surface: #161B2A;
   --font-sans: "DM Sans", system-ui, sans-serif;
   --font-display: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
@@ -74,11 +74,11 @@ body {
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #2a3548;
+  background: #2f3a50;
   border-radius: 4px;
 }
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #3b4d66;
+  background: #435068;
 }
 .light ::-webkit-scrollbar-thumb {
   background: #c5cdd8;
@@ -96,9 +96,9 @@ body {
 
 /* Glass panel utility */
 .dark .glass-panel {
-  background: rgba(17, 24, 39, 0.6);
+  background: rgba(24, 29, 46, 0.7);
   backdrop-filter: blur(20px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 .light .glass-panel {
   background: rgba(255, 255, 255, 0.7);
@@ -149,8 +149,8 @@ body {
   position: relative;
 }
 .dark .step-mockup {
-  background: linear-gradient(135deg, #111827 0%, #1E293B 100%);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: linear-gradient(135deg, #181D2E 0%, #232A3C 100%);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 .light .step-mockup {
   background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
