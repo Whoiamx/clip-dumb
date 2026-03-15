@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+dist
+public/uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+*.tsbuildinfo
+.env
+.env.local
+.env.*
+!.env.example
+.agent/
+.agents/
+.claude/
+skills-lock.json
+showmatch-ui.png

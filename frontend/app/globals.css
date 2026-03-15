@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+/* ── Dark theme (default) ── */
+@theme {
+  --color-background: #0B0F19;
+  --color-foreground: #F0EDE8;
+  --color-card: #111827;
+  --color-card-foreground: #F0EDE8;
+  --color-primary: #FF5E3A;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #1E293B;
+  --color-secondary-foreground: #94A3B8;
+  --color-muted: #151C2C;
+  --color-muted-foreground: #64748B;
+  --color-accent: #F5C542;
+  --color-accent-foreground: #0B0F19;
+  --color-destructive: #EF4444;
+  --color-border: #1E293B;
+  --color-ring: #FF5E3A;
+  --color-surface: #0F1525;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+/* ── Light theme overrides ── */
+.light {
+  --color-background: #FAFAF8;
+  --color-foreground: #1A1A2E;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #1A1A2E;
+  --color-primary: #E8451A;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #F1F5F9;
+  --color-secondary-foreground: #475569;
+  --color-muted: #F1F0ED;
+  --color-muted-foreground: #64748B;
+  --color-accent: #D4A017;
+  --color-accent-foreground: #1A1A2E;
+  --color-destructive: #DC2626;
+  --color-border: #E2E8F0;
+  --color-ring: #E8451A;
+  --color-surface: #F5F5F2;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-feature-settings: "ss01", "ss02";
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Film grain overlay — dark only */
+.dark body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #2a3548;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3b4d66;
+}
+.light ::-webkit-scrollbar-thumb {
+  background: #c5cdd8;
+  border-radius: 4px;
+}
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #a0aab8;
+}
+
+/* Smooth selection */
+::selection {
+  background: rgba(255, 94, 58, 0.3);
+  color: #fff;
+}
+
+/* Glass panel utility */
+.dark .glass-panel {
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(20px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.light .glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(1.2);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Subtle vignette — dark only */
+.dark .vignette::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+  z-index: 1;
+}
+
+/* Glow utility */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(255, 94, 58, 0.15), 0 0 60px rgba(255, 94, 58, 0.05);
+}
+.light .glow-primary {
+  box-shadow: 0 4px 20px rgba(232, 69, 26, 0.2), 0 0 60px rgba(232, 69, 26, 0.06);
+}
+
+.glow-accent {
+  box-shadow: 0 0 20px rgba(245, 197, 66, 0.15), 0 0 60px rgba(245, 197, 66, 0.05);
+}
+
+/* Geometric pattern for backgrounds */
+.dark .geo-pattern {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.light .geo-pattern {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Step mockup illustrations */
+.step-mockup {
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+.dark .step-mockup {
+  background: linear-gradient(135deg, #111827 0%, #1E293B 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.light .step-mockup {
+  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
