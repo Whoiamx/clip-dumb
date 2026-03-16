@@ -4,7 +4,7 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { Play, Square, Loader2, User, Volume2, AlertCircle } from "lucide-react";
 import { VOICES, LANGUAGES } from "@/lib/data/voices";
 import type { VoiceOption } from "@/lib/types/voice";
-import { API_URL } from "@/lib/config";
+import { apiFetch } from "@/lib/api-fetch";
 
 interface VoicePickerProps {
   selectedVoiceId: string;
@@ -47,7 +47,7 @@ export function VoicePicker({ selectedVoiceId, onSelect, language = "en" }: Voic
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`${API_URL}/api/voices?language=${encodeURIComponent(language)}`)
+    apiFetch(`/api/voices?language=${encodeURIComponent(language)}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch voices");
         return res.json();
@@ -132,7 +132,7 @@ export function VoicePicker({ selectedVoiceId, onSelect, language = "en" }: Voic
         blob = await res.blob();
       } else {
         // Fallback: generate via TTS for languages without a static preview
-        const res = await fetch(`${API_URL}/api/voice-preview`, {
+        const res = await apiFetch("/api/voice-preview", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ voiceId: voice.id, language }),

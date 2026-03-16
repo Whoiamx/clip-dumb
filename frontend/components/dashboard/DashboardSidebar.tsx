@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FolderOpen, Download, BarChart3, Settings, User } from "lucide-react";
+import { FolderOpen, Download, BarChart3, Settings, User, LogOut } from "lucide-react";
 import { ClipDubLogo } from "@/components/brand/ClipDubLogo";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ const NAV_ITEMS = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
 
   const isActive = (href: string) => {
     if (href === "/dashboard") return pathname === "/dashboard";
@@ -55,13 +55,28 @@ export function DashboardSidebar() {
       {user && (
         <div className="border-t border-border/40 px-4 py-3">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <User className="h-4 w-4" />
+            {user.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt=""
+                className="h-8 w-8 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <User className="h-4 w-4" />
+              </div>
+            )}
+            <div className="flex flex-1 flex-col overflow-hidden">
+              <span className="text-sm font-medium text-foreground truncate">{user.name}</span>
+              <span className="text-xs text-muted-foreground truncate">{user.email}</span>
             </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-foreground">{user.name}</span>
-              <span className="text-[11px] text-muted-foreground">Free Plan</span>
-            </div>
+            <button
+              onClick={logout}
+              className="shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              title="Sign out"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+            </button>
           </div>
         </div>
       )}

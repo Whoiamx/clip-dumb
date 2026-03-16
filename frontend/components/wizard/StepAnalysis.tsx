@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useWizardStore } from "@/lib/store/wizard-store";
 import { useProjectStore } from "@/lib/store/project-store";
 import { Loader2, CheckCircle, AlertCircle, Brain } from "lucide-react";
-import { API_URL } from "@/lib/config";
+import { apiFetch } from "@/lib/api-fetch";
 
 export function StepAnalysis() {
   const { isAnalyzing, analysisProgress, setAnalyzing, setStep, language } =
@@ -27,7 +27,7 @@ export function StepAnalysis() {
         const frames = await extractFrames(project.video!.url, 2);
         setAnalyzing(true, 30);
 
-        const res = await fetch(`${API_URL}/api/analyze-frames`, {
+        const res = await apiFetch("/api/analyze-frames", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

@@ -6,7 +6,7 @@ import { useEditorStore } from "@/lib/store/editor-store";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2, CheckCircle, Film } from "lucide-react";
 import type { ExportSettings } from "@/lib/types/project";
-import { API_URL } from "@/lib/config";
+import { apiFetch } from "@/lib/api-fetch";
 
 const QUALITY_PRESETS: {
   value: ExportSettings["quality"];
@@ -28,7 +28,7 @@ export function ExportPanel() {
     setDownloadUrl(null);
 
     try {
-      const res = await fetch(`${API_URL}/api/render`, {
+      const res = await apiFetch("/api/render", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -42,8 +42,8 @@ export function ExportPanel() {
       const { renderId } = await res.json();
 
       const poll = async () => {
-        const statusRes = await fetch(
-          `${API_URL}/api/render-status?id=${encodeURIComponent(renderId)}`
+        const statusRes = await apiFetch(
+          `/api/render-status?id=${encodeURIComponent(renderId)}`
         );
         const status = await statusRes.json();
 

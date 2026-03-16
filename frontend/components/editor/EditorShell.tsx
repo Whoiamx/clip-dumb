@@ -9,7 +9,7 @@ import { Timeline } from "./Timeline";
 import { SubtitleEditor } from "./SubtitleEditor";
 import { DeviceMockupPicker } from "./DeviceMockupPicker";
 import { ExportPanel } from "./ExportPanel";
-import { API_URL } from "@/lib/config";
+import { apiFetch } from "@/lib/api-fetch";
 import { Button } from "@/components/ui/button";
 import {
   Type,
@@ -111,7 +111,7 @@ export function EditorShell() {
 
       setAnalyzing(true, 30);
 
-      const res = await fetch(`${API_URL}/api/analyze-frames`, {
+      const res = await apiFetch("/api/analyze-frames", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ frames, fps: project.composition.fps, language: project.language || "en", videoDurationInFrames: project.video.durationInFrames }),

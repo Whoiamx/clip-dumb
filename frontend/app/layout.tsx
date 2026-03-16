@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AuthInitializer } from "@/components/AuthInitializer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -35,7 +36,10 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased vignette">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <AuthInitializer />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
