@@ -5,7 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ClipDubLogo } from "@/components/brand/ClipDubLogo";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { API_URL } from "@/lib/config";
 import Link from "next/link";
+
+const GENERIC_AUTH_ERROR = "Invalid credentials or authentication method.";
 
 export default function LoginPageWrapper() {
   return (
@@ -31,12 +34,26 @@ function LoginPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  async function checkProvider(emailToCheck: string, method: "email" | "google"): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/check-provider`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailToCheck, method }),
+      });
+      const data = await res.json();
+      return data.allowed !== false;
+    } catch {
+      return true; // Allow on network error — Supabase will catch real issues
+    }
+  }
+
   async function handleGoogle() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
-    if (error) setError(error.message);
+    if (error) setError(GENERIC_AUTH_ERROR);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -45,11 +62,19 @@ function LoginPage() {
     setMessage("");
     setLoading(true);
 
+    // Pre-check auth provider before hitting Supabase
+    const allowed = await checkProvider(email, "email");
+    if (!allowed) {
+      setLoading(false);
+      setError(GENERIC_AUTH_ERROR);
+      return;
+    }
+
     if (mode === "signup") {
       const { error } = await supabase.auth.signUp({ email, password });
       setLoading(false);
       if (error) {
-        setError(error.message);
+        setError(GENERIC_AUTH_ERROR);
       } else {
         setMessage("Check your email for a confirmation link.");
       }
@@ -60,7 +85,7 @@ function LoginPage() {
       });
       setLoading(false);
       if (error) {
-        setError(error.message);
+        setError(GENERIC_AUTH_ERROR);
       } else {
         router.refresh();
         router.push("/dashboard");

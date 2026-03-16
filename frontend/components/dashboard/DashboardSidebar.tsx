@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FolderOpen, Download, BarChart3, Settings, User, LogOut } from "lucide-react";
+import { FolderOpen, Download, BarChart3, Settings, User, LogOut, Shield } from "lucide-react";
 import { ClipDubLogo } from "@/components/brand/ClipDubLogo";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ const NAV_ITEMS = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const { user, logout } = useAuthStore();
+  const { user, logout, isAdmin } = useAuthStore();
 
   const isActive = (href: string) => {
     if (href === "/dashboard") return pathname === "/dashboard";
@@ -49,6 +49,23 @@ export function DashboardSidebar() {
             {item.label}
           </Link>
         ))}
+        {isAdmin && (
+          <>
+            <div className="my-2 border-t border-border/40" />
+            <Link
+              href="/dashboard/admin"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
+                pathname.startsWith("/dashboard/admin")
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+              )}
+            >
+              <Shield className="h-4 w-4 shrink-0" />
+              Admin
+            </Link>
+          </>
+        )}
       </nav>
 
       {/* User */}
@@ -59,6 +76,8 @@ export function DashboardSidebar() {
               <img
                 src={user.avatarUrl}
                 alt=""
+                referrerPolicy="no-referrer"
+                crossOrigin="anonymous"
                 className="h-8 w-8 rounded-full object-cover"
               />
             ) : (

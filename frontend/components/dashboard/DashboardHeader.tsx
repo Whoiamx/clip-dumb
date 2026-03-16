@@ -26,7 +26,7 @@ export function DashboardHeader() {
           {user && (
             <>
               {user.avatarUrl ? (
-                <img src={user.avatarUrl} alt="" className="h-8 w-8 rounded-full object-cover" />
+                <img src={user.avatarUrl} alt="" referrerPolicy="no-referrer" crossOrigin="anonymous" className="h-8 w-8 rounded-full object-cover" />
               ) : (
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
                   <User className="h-4 w-4" />
