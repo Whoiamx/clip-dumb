@@ -2,12 +2,18 @@ import { create } from "zustand";
 import { createClient } from "@/lib/supabase/client";
 import { API_URL } from "@/lib/config";
 
+interface Subscription {
+  plan: string;
+  status: string;
+}
+
 interface User {
   name: string;
   email: string;
   avatarUrl: string | null;
   role: "user" | "admin";
   authProvider: "email" | "google";
+  subscription: Subscription | null;
 }
 
 interface AuthState {
@@ -35,22 +41,25 @@ function mapUser(supabaseUser: {
   const avatarUrl = (meta.avatar_url as string) || (meta.picture as string) || null;
   const provider = appMeta.provider === "google" ? "google" : "email";
 
-  return { name, email, avatarUrl, authProvider: provider };
+  return { name, email, avatarUrl, authProvider: provider, subscription: null };
 }
 
 let unsubscribe: (() => void) | null = null;
 
-async function fetchRole(token: string): Promise<"user" | "admin"> {
+async function fetchUserData(token: string): Promise<{ role: "user" | "admin"; subscription: Subscription | null }> {
   try {
     const res = await fetch(`${API_URL}/api/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (res.ok) {
       const data = await res.json();
-      return data.role === "admin" ? "admin" : "user";
+      return {
+        role: data.role === "admin" ? "admin" : "user",
+        subscription: data.subscription ?? null,
+      };
     }
   } catch {}
-  return "user";
+  return { role: "user", subscription: null };
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -70,37 +79,37 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     if (user) {
       const { data: { session } } = await supabase.auth.getSession();
-      const role = session?.access_token
-        ? await fetchRole(session.access_token)
-        : "user";
+      const userData = session?.access_token
+        ? await fetchUserData(session.access_token)
+        : { role: "user" as const, subscription: null };
       const mapped = mapUser(user);
       set({
-        user: { ...mapped, role },
+        user: { ...mapped, role: userData.role, subscription: userData.subscription },
         isLoggedIn: true,
         isLoading: false,
-        isAdmin: role === "admin",
+        isAdmin: userData.role === "admin",
       });
     } else {
       set({ user: null, isLoggedIn: false, isLoading: false, isAdmin: false });
     }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        const role = session.access_token
-          ? await fetchRole(session.access_token)
-          : "user";
+        const userData = session.access_token
+          ? await fetchUserData(session.access_token)
+          : { role: "user" as const, subscription: null };
         const mapped = mapUser(session.user);
         set({
-          user: { ...mapped, role },
+          user: { ...mapped, role: userData.role, subscription: userData.subscription },
           isLoggedIn: true,
-          isAdmin: role === "admin",
+          isAdmin: userData.role === "admin",
         });
       } else {
         set({ user: null, isLoggedIn: false, isAdmin: false });
       }
     });
 
-    unsubscribe = () => subscription.unsubscribe();
+    unsubscribe = () => authSubscription.unsubscribe();
   },
 
   logout: async () => {

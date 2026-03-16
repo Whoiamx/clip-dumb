@@ -23,6 +23,7 @@ export async function saveProject(project: Project): Promise<void> {
 function migrateProject(p: Project): Project {
   return {
     ...p,
+    type: p.type ?? "tutorial",
     chapters: p.chapters ?? [],
     subtitles: (p.subtitles ?? []).map((s) => ({
       ...s,

@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -6,32 +6,30 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export const meRouter = Router();
-
-meRouter.get("/auth/me", async (req: Request, res: Response) => {
+export async function requirePremium(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   if (!req.user) {
     res.status(401).json({ error: "Not authenticated" });
     return;
   }
 
-  let subscription: { plan: string; status: string } | null = null;
-
-  const { data: sub } = await supabase
+  const { data: subscription } = await supabase
     .from("subscriptions")
     .select("plan, status, current_period_end")
     .eq("user_id", req.user.id)
+    .in("plan", ["plus", "teams", "pro"])
     .eq("status", "active")
     .gt("current_period_end", new Date().toISOString())
     .single();
 
-  if (sub) {
-    subscription = { plan: sub.plan, status: sub.status };
+  if (!subscription) {
+    res.status(403).json({ error: "Premium subscription required" });
+    return;
   }
 
-  res.json({
-    id: req.user.id,
-    email: req.user.email,
-    role: req.user.role,
-    subscription,
-  });
-});
+  req.subscription = { plan: subscription.plan, status: subscription.status };
+  next();
+}

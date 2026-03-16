@@ -12,6 +12,8 @@ import { requireAuth } from "./middleware/auth";
 import { usageLogger } from "./middleware/usage-logger";
 import { adminRouter } from "./routes/admin";
 import { meRouter } from "./routes/me";
+import { websiteRouter } from "./routes/website";
+import { requirePremium } from "./middleware/premium";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -34,6 +36,7 @@ app.use(cors({
 app.use(express.json({ limit: "50mb" }));
 app.use("/uploads", (_req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Access-Control-Allow-Origin", "*");
   next();
 }, express.static("uploads"));
 
@@ -50,6 +53,9 @@ app.use("/api", requireAuth, usageLogger, renderRouter);
 
 // Auth route (protected, no usage logging)
 app.use("/api", requireAuth, meRouter);
+
+// Website showcase routes (premium gating temporarily disabled for testing)
+app.use("/api", requireAuth, usageLogger, websiteRouter);
 
 // Admin routes (protected + admin only)
 app.use("/api", requireAuth, adminRouter);

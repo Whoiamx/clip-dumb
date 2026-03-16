@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FolderOpen, Download, BarChart3, Settings, User, LogOut, Shield } from "lucide-react";
+import { FolderOpen, Download, BarChart3, Settings, User, LogOut, Shield, Globe } from "lucide-react";
 import { ClipDubLogo } from "@/components/brand/ClipDubLogo";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Projects", icon: FolderOpen },
+  { href: "/dashboard/website-showcase", label: "Website Video", icon: Globe, premium: true },
   { href: "/dashboard/exports", label: "Exports", icon: Download },
   { href: "/dashboard/usage", label: "Usage", icon: BarChart3 },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
@@ -47,6 +48,11 @@ export function DashboardSidebar() {
           >
             <item.icon className="h-4 w-4 shrink-0" />
             {item.label}
+            {"premium" in item && item.premium && !user?.subscription?.plan && (
+              <span className="ml-auto rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-primary">
+                PRO
+              </span>
+            )}
           </Link>
         ))}
         {isAdmin && (

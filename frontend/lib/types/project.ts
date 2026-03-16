@@ -3,6 +3,7 @@ export interface Project {
   name: string;
   createdAt: number;
   updatedAt: number;
+  type?: "tutorial" | "website-showcase";
   video: VideoSource | null;
   composition: CompositionSettings;
   subtitles: SubtitleEntry[];
@@ -12,6 +13,7 @@ export interface Project {
   voiceId?: string;
   thumbnailDataUrl?: string;
   trimRegions?: TrimRegion[];
+  websiteShowcase?: import("./website-showcase").WebsiteShowcaseScript;
 }
 
 export interface TrimRegion {
