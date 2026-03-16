@@ -12,6 +12,7 @@ import type { DeviceMockupConfig } from "@/lib/types/project";
 interface DeviceMockupProps {
   config: DeviceMockupConfig;
   videoSrc: string;
+  startFrom?: number;
 }
 
 const MOCKUP_STYLES: Record<
@@ -52,6 +53,7 @@ const MOCKUP_STYLES: Record<
 export const DeviceMockup: React.FC<DeviceMockupProps> = ({
   config,
   videoSrc,
+  startFrom,
 }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
@@ -180,6 +182,7 @@ export const DeviceMockup: React.FC<DeviceMockupProps> = ({
         >
           <OffthreadVideo
             src={videoSrc}
+            startFrom={startFrom}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </div>

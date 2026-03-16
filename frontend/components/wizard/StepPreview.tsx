@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, useRef, useState } from "react";
+import { useEffect, useCallback, useRef, useState, useMemo } from "react";
 import { useProjectStore } from "@/lib/store/project-store";
 import { useEditorStore } from "@/lib/store/editor-store";
 import { VideoPreview } from "@/components/editor/VideoPreview";
@@ -32,6 +32,7 @@ import {
   Redo2,
 } from "lucide-react";
 import type { SubtitleEntry, SubtitleStyle } from "@/lib/types/project";
+import { computeTrimmedDuration, buildSegments, sourceToOutputFrame } from "@/lib/video/trim-mapping";
 
 const FONT_OPTIONS = [
   { value: "Inter, system-ui, sans-serif", label: "Inter" },
@@ -94,6 +95,25 @@ export function StepPreview() {
   );
 
   const chapters = project.chapters ?? [];
+
+  const trimRegions = project.trimRegions ?? [];
+  const effectiveDuration = useMemo(
+    () => trimRegions.length > 0 ? computeTrimmedDuration(totalFrames, trimRegions) : totalFrames,
+    [totalFrames, trimRegions]
+  );
+  const segments = useMemo(
+    () => trimRegions.length > 0 ? buildSegments(totalFrames, trimRegions) : null,
+    [totalFrames, trimRegions]
+  );
+  const trimmedSeconds = useMemo(
+    () => trimRegions.length > 0 ? (totalFrames - effectiveDuration) / fps : 0,
+    [totalFrames, effectiveDuration, fps, trimRegions.length]
+  );
+  // Convert currentFrame (source space) to output space for display
+  const displayFrame = useMemo(() => {
+    if (!segments) return currentFrame;
+    return sourceToOutputFrame(currentFrame, segments) ?? currentFrame;
+  }, [currentFrame, segments]);
 
   // Derive global style from first subtitle (all share the same style)
   const globalStyle: SubtitleStyle = project.subtitles[0]?.style ?? {
@@ -306,8 +326,13 @@ export function StepPreview() {
             <SkipForward className="h-4 w-4" />
           </button>
           <span className="ml-2 font-mono text-xs tabular-nums text-muted-foreground">
-            {formatTime(currentFrame)} / {formatTime(totalFrames)}
+            {formatTime(displayFrame)} / {formatTime(effectiveDuration)}
           </span>
+          {trimmedSeconds > 0 && (
+            <span className="ml-1.5 rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-400">
+              {trimmedSeconds.toFixed(1)}s trimmed
+            </span>
+          )}
         </div>
       </div>
 

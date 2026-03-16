@@ -21,6 +21,8 @@ export default function RootLayout({
             __html: `(function(){try{var t=localStorage.getItem('clipdub-theme');if(t){document.documentElement.className=t}else if(window.matchMedia('(prefers-color-scheme:light)').matches){document.documentElement.className='light'}}catch(e){}})()`,
           }}
         />
+        <meta name="theme-color" content="#111520" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#F4F2EE" media="(prefers-color-scheme: light)" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

@@ -40,7 +40,7 @@ const SIDEBAR_TABS = [
 ];
 
 export function EditorShell() {
-  const { project, undo, redo } = useProjectStore();
+  const { project, undo, redo, removeTrimRegion, updateTrimRegion, pushHistory } = useProjectStore();
   const {
     sidebarTab,
     setSidebarTab,
@@ -283,7 +283,16 @@ export function EditorShell() {
 
           {/* Timeline */}
           <div className="h-48">
-            <Timeline />
+            <Timeline
+              trimRegions={project.trimRegions}
+              onRemoveTrim={(id) => {
+                pushHistory();
+                removeTrimRegion(id);
+              }}
+              onUpdateTrim={(id, updates) => {
+                updateTrimRegion(id, updates);
+              }}
+            />
           </div>
         </div>
       </div>
